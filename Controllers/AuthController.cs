@@ -8,6 +8,7 @@ using SecureAppWithIdentity.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SecureAppWithIdentity.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SecureAppWithIdentity.Controllers;
 
@@ -76,6 +77,14 @@ public class AuthController: ControllerBase
         return Ok(new {Token = "token", Message = "Logged out"});
     }
 
+    [HttpPost]
+    [Route("Check-Token")]
+    [Authorize]
+    public async Task<ActionResult<IdentityUser>> CheckToken()
+    {
+        IdentityUser user = await _userManager.FindByNameAsync(User.Identity.Name);
+        return Ok(user);
+    }
     private async Task<IdentityUser> ValidateUser(LoginCredentials credentials)
     {
         var identityUser = await _userManager.FindByNameAsync(credentials.Username);
